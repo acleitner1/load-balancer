@@ -1,5 +1,6 @@
-// balancer.cc - Load Balancer
-// Anna Leitner, June 2024
+// Anna Leitner 
+// Back End Server 
+
 
 #include <fstream>
 #include<cstring> 
@@ -31,16 +32,15 @@ int main(int argc, char** argv) {
    // Now, we actually create the server 
    bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)); 
    // This makes it listen. 
-   listen(serverSocket, 5); 
+   listen(serverSocket, 5);
+     
    // Accept the request 
    int clientSocket = accept(serverSocket, nullptr, nullptr); 
 
    char buffer[1024] = {0}; 
    recv(clientSocket, buffer, sizeof(buffer), 0); 
 
-   cout << "Message from client: " << buffer << endl; 
+   cout << "Replied with a hello message" << endl; 
    close(serverSocket); 
    return 0;
 }
-
-

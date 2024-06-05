@@ -4,8 +4,8 @@ CXX = g++
 CXXFLAGS = -Wall -Werror -std=c++11 -g -ldl
 LIBS = thread.o libinterrupt.a
 
-balancer: balancer.cc
-	$(CXX) $(CXXFLAGS) -o $@ balancer.cc $(LIBS)
+lbs: lb.cc
+	$(CXX) $(CXXFLAGS) -o $@ lb.cc $(LIBS)
 
 clean:
-	rm -rf balancer balancer.dSYM
+	rm -rf lb lb.dSYM
