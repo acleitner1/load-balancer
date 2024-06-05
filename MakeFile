@@ -1,0 +1,11 @@
+# Makefile for load balancer project
+
+CXX = g++
+CXXFLAGS = -Wall -Werror -std=c++11 -g -ldl
+LIBS = thread.o libinterrupt.a
+
+balancer: balancer.cc
+	$(CXX) $(CXXFLAGS) -o $@ balancer.cc $(LIBS)
+
+clean:
+	rm -rf balancer balancer.dSYM
