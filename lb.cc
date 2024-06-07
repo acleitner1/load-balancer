@@ -10,7 +10,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h> 
 #include <unistd.h>
-#include "be.cc"
 
 using namespace std; 
 
@@ -29,6 +28,8 @@ int main(int argc, char** argv) {
    // Lets it listen to all IPs 
    serverAddress.sin_addr.s_addr = INADDR_ANY; 
 
+   cout << "address: " << serverAddress.sin_port << endl; 
+
    // Now, we actually create the server 
    bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)); 
    // This makes it listen. 
@@ -40,9 +41,29 @@ int main(int argc, char** argv) {
    char buffer[1024] = {0}; 
    recv(clientSocket, buffer, sizeof(buffer), 0); 
    cout << "Message from client: " << buffer << endl; 
+
+   int beSocket = socket(AF_INET, SOCK_STREAM, 0); 
+   sockaddr_in beAddress; 
+   beAddress.sin_family = AF_INET; 
+   // Converts the int address to a byte readable thing
+   beAddress.sin_port = htons(8080); 
+
+   //Only listens to the load balancer 
+   beAddress.sin_addr.s_addr = htons(8000);  
+   cout << "listening : " << beAddress.sin_addr.s_addr << endl; 
+
+   // // Now, we actually create the server 
+   bind(beSocket, (struct sockaddr*)&beAddress, sizeof(beAddress)); 
+   cout << "Sending message to be: " << beSocket << endl; 
    send(beSocket, buffer, strlen(buffer), 0);
+   listen(beSocket, beAddress.sin_port);
+
    recv(beSocket, buffer, sizeof(buffer), 0); 
-   cout << "Message from BE: " << buffer << endl; 
+   clientSocket = accept(beSocket, nullptr, nullptr); 
+   char buffer2[1024] = {0}; 
+   recv(clientSocket, buffer2, sizeof(buffer2), 0); 
+   cout << "Message from Be: " << buffer2 << endl; 
+
    close(serverSocket); 
    return 0;
 }
