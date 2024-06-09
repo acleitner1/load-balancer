@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
    recv(beSocket, buffer2, sizeof(buffer2), 0); 
    //clientSocket = accept(beSocket, nullptr, nullptr); 
    cout << "Message from Be: " << buffer2 << endl; 
-   send(clientSocket, buffer2, strlen(buffer2), 0); 
+   send(clientSocket, buffer2, sizeof(buffer2), 0); 
 
 
    //close(serverSocket); 

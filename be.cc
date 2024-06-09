@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
      
    // Accept the request 
    int clientSocket = accept(serverSocket, nullptr, nullptr); 
-   char* hello = "Hello"; 
+   char* hello = "Hello from Backend Server"; 
    char buffer[1024] = {0}; 
    recv(clientSocket, buffer, sizeof(buffer), 0); 
    cout << "Recieved Message from Client: " << clientSocket << endl; 
