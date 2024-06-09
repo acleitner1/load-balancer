@@ -60,8 +60,9 @@ int main(int argc, char** argv) {
    listen(beSocket, beAddress.sin_port);
    char buffer2[1024] = {0}; 
    recv(beSocket, buffer2, sizeof(buffer2), 0); 
-   clientSocket = accept(beSocket, nullptr, nullptr); 
+   //clientSocket = accept(beSocket, nullptr, nullptr); 
    cout << "Message from Be: " << buffer2 << endl; 
+   send(clientSocket, buffer2, strlen(buffer2), 0); 
 
 
    //close(serverSocket); 
