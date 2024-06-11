@@ -41,8 +41,12 @@ int main(int argc, char** argv) {
 
    // Now, we actually create the server 
    bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)); 
-   // This makes it listen. 
+   int server_counter = 0; 
    while(1) {
+      if (server_counter >= servers.size()) {
+         server_counter = 0; 
+      }
+      // This makes it listen. 
       listen(serverSocket, 5);
      
       // Accept the request 
@@ -58,7 +62,7 @@ int main(int argc, char** argv) {
       beAddress.sin_family = AF_INET; 
       // // Converts the int address to a byte readable thing
       // GRAB THESE FROM THE LIST OF BE SERVERS 
-      beAddress.sin_port = htons(8080); 
+      beAddress.sin_port = htons(servers[server_counter]); 
 
       // Now, we actually create the server 
       bind(beSocket, (struct sockaddr*)&beAddress, sizeof(beAddress)); 
@@ -74,6 +78,7 @@ int main(int argc, char** argv) {
 
       close(clientSocket); 
       close(beSocket); 
+      server_counter++; 
    }
    
    close(serverSocket); 
