@@ -32,20 +32,22 @@ int main(int argc, char** argv) {
    // Now, we actually create the server 
    bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)); 
    // This makes it listen. 
-   listen(serverSocket, 5);
+   while (1) {
+      listen(serverSocket, 5);
      
-   // Accept the request 
-   int clientSocket = accept(serverSocket, nullptr, nullptr); 
-   char* hello = "Hello from Backend Server"; 
-   char buffer[1024] = {0}; 
-   recv(clientSocket, buffer, sizeof(buffer), 0); 
-   cout << "Recieved Message from Client: " << clientSocket << endl; 
-   cout << "Message from client: " << buffer << endl; 
+      // Accept the request 
+      int clientSocket = accept(serverSocket, nullptr, nullptr); 
+      char* hello = "Hello from Backend Server"; 
+      char buffer[1024] = {0}; 
+      recv(clientSocket, buffer, sizeof(buffer), 0); 
+      cout << "Recieved Message from Client: " << clientSocket << endl; 
+      cout << "Message from client: " << buffer << endl; 
 
-   send(clientSocket, hello, sizeof(hello), 0);
-   cout << "Replied with a hello message" << endl; 
+      send(clientSocket, hello, sizeof(hello), 0);
+      cout << "Replied with a hello message" << endl; 
 
-   close(clientSocket);
-   //close(serverSocket); 
+      close(clientSocket);
+   }
+   close(serverSocket); 
    return 0;
 }
