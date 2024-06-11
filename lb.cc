@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
    sockaddr_in serverAddress; 
    serverAddress.sin_family = AF_INET; 
    // Converts the int address to a byte readable thing
-   serverAddress.sin_port = htons(8000); 
+   serverAddress.sin_port = htons(80); 
    // Lets it listen to all IPs 
    serverAddress.sin_addr.s_addr = INADDR_ANY; 
 
