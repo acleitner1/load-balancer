@@ -13,6 +13,9 @@
 
 using namespace std; 
 
+// TO DO: 
+// 1. Add some html to be servers 
+// 2. Step 3
 /*
 * main - Creates socket server 
 *
