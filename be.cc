@@ -1,8 +1,3 @@
-// Anna Leitner 
-// Back End Server 
-
-
-#include <fstream>
 #include<cstring> 
 #include <iostream>
 #include <string>
@@ -42,20 +37,10 @@ int main(int argc, char** argv) {
       recv(clientSocket, buffer, sizeof(buffer), 0); 
       cout << "Recieved Message from Client: " << clientSocket << endl; 
       cout << "Message from client: " << buffer << endl; 
-      string health = ""; 
-      for (int i = 0; i < 14; i++) {
-         health+= buffer[i]; 
-      }
-      cout << "health: " << health << endl; 
-      if (health ==  "GET / HTTP/1.1") {
-         cout << "health check" << endl; 
-         send(clientSocket, "200", sizeof("200"), 0); 
-         close(clientSocket); 
-      }
-      else { 
-         send(clientSocket, hello, sizeof(hello), 0);
-         cout << "Replied with a hello message" << endl; 
-      }
+
+      send(clientSocket, hello, sizeof(hello), 0);
+      cout << "Replied with a hello message" << endl; 
+
       close(clientSocket);
    }
    close(serverSocket); 

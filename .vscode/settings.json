@@ -5,6 +5,7 @@
       "string": "cpp",
       "__split_buffer": "cpp",
       "deque": "cpp",
-      "thread": "cpp"
+      "thread": "cpp",
+      "iostream": "cpp"
    }
 }

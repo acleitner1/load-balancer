@@ -24,7 +24,7 @@ string get_http;
 
 void health_check() { 
    while(1) { 
-      cout << "healthy" << endl; 
+      cout << "servers.size(): " << servers.size() << endl; 
       for (int i = 0; i < servers.size(); i++) {
          int beSocket = socket(AF_INET, SOCK_STREAM, 0); 
          sockaddr_in beAddress; 
@@ -40,11 +40,11 @@ void health_check() {
          send(beSocket, get_http.c_str(), strlen(get_http.c_str())+1, 0); 
          recv(beSocket, health_buffer, sizeof(health_buffer)+1, 0); 
 
-         if (health_buffer != "200") {
+         if (health_buffer != "Hello fr") {
+            cout << "Health buffer not 200" << endl; 
             servers[i][1] = 0; 
          }
          else {
-            cout << "Health buffer not 200: " << health_buffer << endl; 
             servers[i][1] = 1; 
          }
       }
@@ -117,13 +117,8 @@ int main(int argc, char** argv) {
       // Now, we actually create the server 
       bind(beSocket, (struct sockaddr*)&beAddress, sizeof(beAddress)); 
       connect(beSocket, (struct sockaddr*)&beAddress, sizeof(beAddress));
-      char health_buffer[1024] = {0}; 
-      send(beSocket, get_http.c_str(), strlen(get_http.c_str())+1, 0); 
-      recv(beSocket, health_buffer, sizeof(health_buffer)+1, 0); 
-      cout << "health buffer: " << health_buffer << endl; 
 
       send(beSocket, buffer, strlen(buffer), 0);
-      listen(beSocket, beAddress.sin_port);
       char buffer2[1024] = {0}; 
       recv(beSocket, buffer2, sizeof(buffer2), 0); 
       cout << "Message from Be: " << buffer2 << endl; 
