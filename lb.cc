@@ -23,17 +23,17 @@ int hold;
 string get_http;
 
 void health_check() { 
-   int serverSocket = socket(AF_INET, SOCK_STREAM, 0); 
-   sockaddr_in serverAddress; 
-   serverAddress.sin_family = AF_INET; 
-   // Converts the int address to a byte readable thing
-   serverAddress.sin_port = htons(80); 
-   // Lets it listen to all IPs 
-   serverAddress.sin_addr.s_addr = INADDR_ANY; 
+   // int serverSocket = socket(AF_INET, SOCK_STREAM, 0); 
+   // sockaddr_in serverAddress; 
+   // serverAddress.sin_family = AF_INET; 
+   // // Converts the int address to a byte readable thing
+   // serverAddress.sin_port = htons(80); 
+   // // Lets it listen to all IPs 
+   // serverAddress.sin_addr.s_addr = INADDR_ANY; 
    
 
    // Now, we actually create the server 
-   bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)); 
+  // bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)); 
    while(1) { 
       cout << "servers.size(): " << servers.size() << endl; 
       for (int i = 0; i < servers.size(); i++) {
@@ -43,22 +43,29 @@ void health_check() {
          // // Converts the int address to a byte readable thing
          // GRAB THESE FROM THE LIST OF BE SERVERS 
          beAddress.sin_port = htons(servers[i][0]); 
-         cout << "servers: " << servers[i][0] << endl; 
 
          // Now, we actually create the server 
          bind(beSocket, (struct sockaddr*)&beAddress, sizeof(beAddress)); 
          connect(beSocket, (struct sockaddr*)&beAddress, sizeof(beAddress));
-         char health_buffer[1024] = {0}; 
-         send(beSocket, get_http.c_str(), strlen(get_http.c_str())+1, 0); 
-         recv(beSocket, health_buffer, sizeof(health_buffer)+1, 0); 
 
-         if (health_buffer != "Hello fr") {
+         send(beSocket, "GET", strlen("GET"), 0);
+         char buffer2[1024] = {0}; 
+         recv(beSocket, buffer2, sizeof(buffer2), 0); 
+         cout << "Message from Be: " << buffer2 << endl; 
+         string buffer_string; 
+         for (int i = 0; i < 9; i++) {
+            buffer_string += buffer2[i]; 
+         }
+         if (buffer_string != "Hello fr") {
             cout << "Server unhealthy" << endl; 
+            cout << buffer2 << endl; 
             servers[i][1] = 0; 
          }
          else {
+            cout << "server healthy" << endl; 
             servers[i][1] = 1; 
          }
+         close(beSocket); 
       }
       std::this_thread::sleep_for(std::chrono::seconds(hold));
    }
@@ -106,6 +113,13 @@ int main(int argc, char** argv) {
    while(1) {
       if (server_counter >= servers.size()) {
          server_counter = 0; 
+      }
+      while(server_counter < servers.size() && servers[server_counter][1] == 0) {
+         server_counter++; 
+         if (server_counter >= servers.size()) {
+            server_counter = 0; 
+         }
+         //cout << "Looking for a healthy server" << endl; 
       }
       // This makes it listen. 
       listen(serverSocket, 5);
