@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
       send(beSocket, get_http.c_str(), strlen(get_http.c_str())+1, 0); 
       recv(beSocket, health_buffer, sizeof(health_buffer)+1, 0); 
       cout << "health buffer: " << health_buffer << endl; 
-
+      
       send(beSocket, buffer, strlen(buffer), 0);
       listen(beSocket, beAddress.sin_port);
       char buffer2[1024] = {0}; 
