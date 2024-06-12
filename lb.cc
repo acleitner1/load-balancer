@@ -23,6 +23,17 @@ int hold;
 string get_http;
 
 void health_check() { 
+   int serverSocket = socket(AF_INET, SOCK_STREAM, 0); 
+   sockaddr_in serverAddress; 
+   serverAddress.sin_family = AF_INET; 
+   // Converts the int address to a byte readable thing
+   serverAddress.sin_port = htons(80); 
+   // Lets it listen to all IPs 
+   serverAddress.sin_addr.s_addr = INADDR_ANY; 
+   
+
+   // Now, we actually create the server 
+   bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)); 
    while(1) { 
       cout << "servers.size(): " << servers.size() << endl; 
       for (int i = 0; i < servers.size(); i++) {
@@ -32,6 +43,7 @@ void health_check() {
          // // Converts the int address to a byte readable thing
          // GRAB THESE FROM THE LIST OF BE SERVERS 
          beAddress.sin_port = htons(servers[i][0]); 
+         cout << "servers: " << servers[i][0] << endl; 
 
          // Now, we actually create the server 
          bind(beSocket, (struct sockaddr*)&beAddress, sizeof(beAddress)); 
@@ -41,7 +53,7 @@ void health_check() {
          recv(beSocket, health_buffer, sizeof(health_buffer)+1, 0); 
 
          if (health_buffer != "Hello fr") {
-            cout << "Health buffer not 200" << endl; 
+            cout << "Server unhealthy" << endl; 
             servers[i][1] = 0; 
          }
          else {
@@ -74,8 +86,6 @@ int main(int argc, char** argv) {
    string health_check_url = argv[argc-2]; 
    hold = atoi(argv[argc - 1]); 
    get_http = "GET / HTTP/1.1\r\nHost: " + health_check_url + "\r\nConnection: close\r\n\r\n";
-   cout << "creating thread" << endl; 
-   thread t1(health_check); 
    // Creates a TCP style socket 
    // AF_INET = IPv4 Protocal Family 
    cout << "past the health" << endl; 
@@ -92,6 +102,7 @@ int main(int argc, char** argv) {
    bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)); 
    
    int server_counter = 0; 
+   thread t1(health_check); 
    while(1) {
       if (server_counter >= servers.size()) {
          server_counter = 0; 
