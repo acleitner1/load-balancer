@@ -16,7 +16,9 @@
 using namespace std; 
 
 // TO DO: 
-// 2. Step 3
+// 1. Rewrite step 1 in python 
+// 2. Rewrite step 2 in python 
+// 3. Step 3
 
 vector< vector<int> > servers; 
 int hold; 
