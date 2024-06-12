@@ -10,19 +10,55 @@
 #include <sys/socket.h>
 #include <netinet/in.h> 
 #include <unistd.h>
+#include<thread> 
 
 
 using namespace std; 
 
 // TO DO: 
 // 2. Step 3
+
+vector< vector<int> > servers; 
+int hold; 
+string get_http;
+
+void health_check() { 
+   while(1) { 
+      cout << "healthy" << endl; 
+      for (int i = 0; i < servers.size(); i++) {
+         int beSocket = socket(AF_INET, SOCK_STREAM, 0); 
+         sockaddr_in beAddress; 
+         beAddress.sin_family = AF_INET; 
+         // // Converts the int address to a byte readable thing
+         // GRAB THESE FROM THE LIST OF BE SERVERS 
+         beAddress.sin_port = htons(servers[i][0]); 
+
+         // Now, we actually create the server 
+         bind(beSocket, (struct sockaddr*)&beAddress, sizeof(beAddress)); 
+         connect(beSocket, (struct sockaddr*)&beAddress, sizeof(beAddress));
+         char health_buffer[1024] = {0}; 
+         send(beSocket, get_http.c_str(), strlen(get_http.c_str())+1, 0); 
+         recv(beSocket, health_buffer, sizeof(health_buffer)+1, 0); 
+
+         if (health_buffer != "200") {
+            servers[i][1] = 0; 
+         }
+         else {
+            cout << "Health buffer not 200: " << health_buffer << endl; 
+            servers[i][1] = 1; 
+         }
+      }
+      std::this_thread::sleep_for(std::chrono::seconds(hold));
+   }
+}
+
+
 /*
 * main - Creates socket server 
 *
 */
 int main(int argc, char** argv) {
    // Takes, as arguments, 1 or more servers 
-   vector<int> servers; 
    if (argc < 3) {
       cout << "Must include names of available servers as HTONS convertable numbers, a health check url, and a frequency at which to health check" << endl; 
       exit(1); 
@@ -30,14 +66,19 @@ int main(int argc, char** argv) {
    for (int i = 1; i < argc - 2; i++) {
       string num = argv[i]; 
       int num_i = stoi(num); 
-      servers.push_back(num_i); 
+      vector<int> tuple; 
+      tuple.push_back(num_i); 
+      tuple.push_back(1); 
+      servers.push_back(tuple); 
    }
    string health_check_url = argv[argc-2]; 
-   int health_check = atoi(argv[argc - 1]); 
-   string get_http = "GET / HTTP/1.1\r\nHost: " + health_check_url + "\r\nConnection: close\r\n\r\n";
-   
+   hold = atoi(argv[argc - 1]); 
+   get_http = "GET / HTTP/1.1\r\nHost: " + health_check_url + "\r\nConnection: close\r\n\r\n";
+   cout << "creating thread" << endl; 
+   thread t1(health_check); 
    // Creates a TCP style socket 
    // AF_INET = IPv4 Protocal Family 
+   cout << "past the health" << endl; 
    int serverSocket = socket(AF_INET, SOCK_STREAM, 0); 
    sockaddr_in serverAddress; 
    serverAddress.sin_family = AF_INET; 
@@ -71,7 +112,7 @@ int main(int argc, char** argv) {
       beAddress.sin_family = AF_INET; 
       // // Converts the int address to a byte readable thing
       // GRAB THESE FROM THE LIST OF BE SERVERS 
-      beAddress.sin_port = htons(servers[server_counter]); 
+      beAddress.sin_port = htons(servers[server_counter][0]); 
 
       // Now, we actually create the server 
       bind(beSocket, (struct sockaddr*)&beAddress, sizeof(beAddress)); 
@@ -80,7 +121,7 @@ int main(int argc, char** argv) {
       send(beSocket, get_http.c_str(), strlen(get_http.c_str())+1, 0); 
       recv(beSocket, health_buffer, sizeof(health_buffer)+1, 0); 
       cout << "health buffer: " << health_buffer << endl; 
-      
+
       send(beSocket, buffer, strlen(buffer), 0);
       listen(beSocket, beAddress.sin_port);
       char buffer2[1024] = {0}; 
@@ -95,7 +136,10 @@ int main(int argc, char** argv) {
    }
    
    close(serverSocket); 
+   t1.join(); 
    return 0;
 }
+
+
 
 
