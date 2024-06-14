@@ -9,7 +9,6 @@ be = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 be.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 be.bind((HOST, PORT)) 
 be.listen(1) 
-print("listening") 
 
 while True: 
    client_connection, client_address = be.accept() 

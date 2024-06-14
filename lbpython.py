@@ -24,7 +24,6 @@ while True:
    be = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
    be.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
    be.connect((BEHOST, BEPORT))
-   print("send")
    be.sendall(request_data)
    be_data = be.recv(1024) 
    print("Recived: " + be_data.decode('utf-8') + " from be server")
