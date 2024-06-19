@@ -33,7 +33,7 @@ while True:
    be.connect((BEHOST, BEPORT))
    be.sendall(request_data)
    be_data = be.recv(1024) 
-   print("Recived: " + be_data.decode('utf-8') + " from be server")
+   print("Recived: " + be_data.decode('utf-8') + "from be server: ")
    client_connection.sendall(be_data) 
    client_connection.close()
    be.close()
