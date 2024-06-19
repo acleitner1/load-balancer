@@ -3,6 +3,7 @@
 
 import socket
 import sys
+import requests 
 
 HOST, PORT = '', 80
 
@@ -11,9 +12,11 @@ lb.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 lb.bind((HOST, PORT)) 
 lb.listen(1) 
 servers = []
-for i in range(len(sys.argv)): 
+for i in range(len(sys.argv) - 2): 
    if (i != 0): 
       servers.append(int(sys.argv[i]))
+interval = sys.argv[len(sys.argv) - 2]    
+healthcode_url = sys.argv[len(sys.argv) - 1] 
 server_counter = 0
 while True: 
    if (server_counter >= len(servers)): 
@@ -31,6 +34,8 @@ while True:
    be = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
    be.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
    be.connect((BEHOST, BEPORT))
+   health = requests.get(healthcode_url + ":" + str(servers[server_counter])) 
+   print(health.status_code)
    be.sendall(request_data)
    be_data = be.recv(1024) 
    print("Recived: " + be_data.decode('utf-8') + "from be server: ")
