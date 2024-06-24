@@ -33,14 +33,14 @@ def health_check(interval, url):
       time.sleep(interval)  
 
 def handle(server_counter): 
-   sending_lock.acquire()
-   lb = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-   lb.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-   lb.bind((HOST, PORT)) 
-   lb.listen(1) 
+   # lb = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+   # lb.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+   # lb.bind((HOST, PORT)) 
+   # lb.listen(1) 
 
 
    while True: 
+      sending_lock.acquire()
       handler = threading.Thread(target = handle, args=(server_counter,))
       handler.start() 
       server_lock.acquire()
@@ -81,9 +81,14 @@ for i in range(len(sys.argv) - 2):
       servers.append((int(sys.argv[i]), 1))    
 interval = int(sys.argv[len(sys.argv) - 2])
 healthcode_url = sys.argv[len(sys.argv) - 1] 
+lb = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+lb.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+lb.bind((HOST, PORT)) 
+lb.listen(1) 
 health_t = threading.Thread(target=health_check, args=(interval, healthcode_url), daemon = True)
 health_t.start()
 server_lock.release()  
+
 handle(server_counter)
 
 
