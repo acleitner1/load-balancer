@@ -34,23 +34,24 @@ def health_check(interval, url):
 
 def handle(server_counter): 
    sending_lock.acquire()
-   print("immediate")
    lb = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
    lb.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
    lb.bind((HOST, PORT)) 
    lb.listen(1) 
-   sending_lock.release()
 
 
    while True: 
+      handler = threading.Thread(target = handle, args=(server_counter,))
+      handler.start() 
+      server_lock.acquire()
       if (server_counter >= len(servers)): 
          server_counter = 0
+      server_lock.release()   
       while (servers[server_counter][1] == 0): 
          server_counter+=1 
          if (server_counter > len(servers)): 
             server_counter = 0    
 
-      sending_lock.acquire()
       client_connection, client_address = lb.accept() 
       print("client connection: " + client_address[0])
       request_data = client_connection.recv(1024) 
@@ -72,6 +73,7 @@ def handle(server_counter):
       be.close()
       server_counter+=1
       sending_lock.release()
+      handler.join()
       
 server_lock.acquire()
 for i in range(len(sys.argv) - 2): 
@@ -82,9 +84,9 @@ healthcode_url = sys.argv[len(sys.argv) - 1]
 health_t = threading.Thread(target=health_check, args=(interval, healthcode_url), daemon = True)
 health_t.start()
 server_lock.release()  
-handler = threading.Thread(target = handle, args=(server_counter,))
-handler.start() 
-handler.join()
+handle(server_counter)
+
+
 
 
  
